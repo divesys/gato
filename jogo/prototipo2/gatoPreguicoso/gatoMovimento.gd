@@ -5,10 +5,13 @@ extends Node2D
  #extração de variaveis externas >
 var painelGlobal #invoca o script painelGlobal, responsavel pelo tamanho do painel
 var analisaPainel #invoca o script global analisaPainel
+var gatoGlobal #invoca o script global gatoGlobal
 var tamanhoPainel #extrai a variavel tamanhoPainel do script painelGlobal
+var exaustaoPainel #extrai a variavel exaustao
 var projecao #extrai a função projeção do projetarGato
 var formaAnalisada #extrai a variavel formaPainelAnalisado do script analisaPainel
 var analisando #extrai a variavel analisando do script analisaPainel
+var exaustao #extrai a variavel exaustão do script gatoGlobal
  #extração de variaveis externas <
 
  #variaveis >
@@ -19,7 +22,6 @@ var passosTotal #o numero de passos que o gato da entre os tiles ao andar normal
 var passosRestantes #o numero de passos que falta para o gato andar
 var numeroCasasAndar #é o numero de casas que o gato vai andar num único movimento
 var timer #timer dos passos
-var yieldTimer #timer usado pro yields que não são o do passo
 var passosIntervalo #o intervalo entre um passo e outro
 var esperaIntervalo #um timer para esperar um intervalo
 var esperaTotal #é o tempo total que devera demorar para o gato andar
@@ -34,6 +36,7 @@ func _ready():
 	analisaPainel = get_node("root/analisaPainel") #captura o script analisaPainel
 	projecao = get_parent().get_node("projecao") #captura o nó projecao
 	analisaPainel = get_node("/root/analisaPainel") #captura o script analisaPainel	
+	gatoGlobal = get_node("/root/gatoGlobal")
 	#captura os scripts externos <
 	
 	#inicializa variaveis >
@@ -48,11 +51,8 @@ func _ready():
 #	print(passosTotal)
 #	print(esperaIntervalo)
 	timer = Timer.new()
-	yieldTimer = Timer.new()
 	add_child(timer)
-	add_child(yieldTimer)
 	timer.set_one_shot(true)
-	yieldTimer.set_one_shot(true)
 	timer.set_wait_time(esperaIntervalo)
 #	yieldTimer.set_wait_time(0.2)
 	#inicializa variaveis <
@@ -76,7 +76,8 @@ func _process(delta):
 	if(Input.is_action_pressed("ui_up")==true and andando == false and esperaProximoMovimento == false):
 		analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(0,-1))
 		formaAnalisada = analisaPainel.get_forma_painel_analisado()
-		print("forma: ",formaAnalisada)
+		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
+#		print("forma: ",formaAnalisada)
 		andando = true
 		if(formaAnalisada == "casa"):
 			esperaProximoMovimento = true
@@ -92,9 +93,11 @@ func _process(delta):
 					passosRestantes = 0
 				if(passosRestantes == 0):
 					esperaProximoMovimento = false
+					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
+					analisaPainel.reset_painel_analisado()
 			passosRestantes = passosTotal
 			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))
-		analisaPainel.reset_forma_painel_analisado()
+
 #		print(gato.get_pos())
 	#move o gato pra cima <
 
@@ -102,7 +105,8 @@ func _process(delta):
 	if(Input.is_action_pressed("ui_down")==true and andando == false and esperaProximoMovimento == false):
 		analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(0,1))
 		formaAnalisada = analisaPainel.get_forma_painel_analisado()
-		print("forma: ",formaAnalisada)
+		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
+#		print("forma: ",formaAnalisada)
 		andando = true
 		if(formaAnalisada == "casa"):
 			esperaProximoMovimento = true
@@ -116,18 +120,20 @@ func _process(delta):
 					passosRestantes = 0
 				if(passosRestantes == 0):
 					esperaProximoMovimento = false
+					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
+					analisaPainel.reset_painel_analisado()
 	#			print(gato.get_pos())
 			passosRestantes = passosTotal
 	#		print(gato.get_pos())
 			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))
-		analisaPainel.reset_forma_painel_analisado()
 	#move o gato pra baixo <
 
 	#move o gato pra direita >
 	if(Input.is_action_pressed("ui_right")==true and andando == false and esperaProximoMovimento == false):
 		analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(1,0))
 		formaAnalisada = analisaPainel.get_forma_painel_analisado()
-		print("forma: ",formaAnalisada)
+		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
+#		print("forma: ",formaAnalisada)
 		andando = true
 		if(formaAnalisada == "casa"):
 			esperaProximoMovimento = true
@@ -142,16 +148,18 @@ func _process(delta):
 					passosRestantes = 0
 				if(passosRestantes == 0):
 					esperaProximoMovimento = false
+					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
+					analisaPainel.reset_painel_analisado()
 			passosRestantes = passosTotal
 			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))
 	#		print(gato.get_pos())
-		analisaPainel.reset_forma_painel_analisado()
 	#move o gato pra direita <
 	
 	#move o gato pra esquerda >
 	if(Input.is_action_pressed("ui_left")==true and andando == false and esperaProximoMovimento == false):
 		analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(-1,0))
 		formaAnalisada = analisaPainel.get_forma_painel_analisado()
+		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
 		print("forma: ",formaAnalisada)
 		andando = true
 		if(formaAnalisada == "casa"):
@@ -167,10 +175,11 @@ func _process(delta):
 					passosRestantes = 0
 				if(passosRestantes == 0):
 					esperaProximoMovimento = false
+					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
+					analisaPainel.reset_painel_analisado()
 			passosRestantes = passosTotal
 			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))
 	#		print(gato.get_pos())
-		analisaPainel.reset_forma_painel_analisado()
 	#move o gato pra esquerda <
 	
 	#libera o movimento <

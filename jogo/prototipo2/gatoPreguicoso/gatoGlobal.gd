@@ -9,8 +9,9 @@ var estamina #a estamina do gato
 
 func _ready():
 
-	#inic
-	estamina = 100
+	#inicializa variaveis >
+	estamina = 450
+	#inicializa variaveis <
 
  #funções get >
 func get_estamina():

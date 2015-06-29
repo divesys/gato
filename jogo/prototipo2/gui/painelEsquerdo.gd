@@ -1,4 +1,4 @@
-	#esse script cuida do posicionamento do painel
+	#esse script cuida do posicionamento do painel esquerdo
 extends Panel
 
  #extração de variaveis externas >
@@ -11,6 +11,7 @@ func _ready():
 	
 	#captura os scripts externos >
 	gatoGlobal = get_node("/root/gatoGlobal")
+	
 	#captura os scripts externos <
 	pass
 
