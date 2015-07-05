@@ -39,7 +39,10 @@ func get_exaustao():
 	
 func get_categoria():
 	return categoria
-	
+
+func get_tipo():
+	return tipo
+
 func get_sentidoEntrada():
 	return sentidoEntrada
  #funções get <

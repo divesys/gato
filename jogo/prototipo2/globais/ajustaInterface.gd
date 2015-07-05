@@ -70,7 +70,7 @@ func _process(delta):
 		extensaoPainelUnico = Vector2(maiorLadoBase-menorLadoBase,menorLadoBase)
 		extensaoPainelDuplo = Vector2((maiorLadoBase-menorLadoBase)/2,menorLadoBase)
 		if(numeroBarrasGUI == 2):
-			correcaoPosicao = Vector2((tamanhoPadraoNode2D/2) - ((ceil((extensaoPainelDuplo.x/tamanhoPainel))-(extensaoPainelDuplo.x/tamanhoPainel))*tamanhoPainel),tamanhoPadraoNode2D/2)
+			correcaoPosicao = Vector2((tamanhoPadraoNode2D/2) - ((ceil((extensaoPainelDuplo.x/tamanhoPainel))-(extensaoPainelDuplo.x/tamanhoPainel))*tamanhoPainel),tamanhoPadraoNode2D/2) #((ceil((extensaoPainelDuplo.x/tamanhoPainel))-(extensaoPainelDuplo.x/tamanhoPainel))*tamanhoPainel) é uma correção devido a maioria das resoluções não resultar numa divisão perfeita da área horizonteal em x paineis, gerando uma sobre, que é o número calculado
 			if(posicaoAreaJogo == "centro"):
 				elementoRegiaoA = barraDuplaA
 				elementoRegiaoB = areaDoJogo

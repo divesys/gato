@@ -13,7 +13,7 @@ var analisaPainel #invoca o script analisa painel
 
  #variaveis >
 export(bool) var passivelComida #verifica se a casa é passivel de ter comida.
-export(String, "parede","casa") var formaPainel #determina a forma do painel, que pode ser parede ou casa
+export(String, "parede","casa","abismo") var formaPainel #determina a forma do painel, que pode ser parede ou casa
 export(String, "prototipal","castelo") var familia #determina a família do painel, basicamente é o tema e no momento tem uma função mais visual, porém podera ser bem útil num futuro editor de fases
 export(String, "nenhuma","cima","baixo","esquerda","direita","vertical","horizontal","cima-esquerda","cima-direita","baixo-esquerda","baixo-direita","não-cima","não-baixo","não-esquerda","não-direita") var direcao #é a direção do painel, pode ter uma direção espeficica(cima,baixo,esquerda,direita) uma direção bilateral(vertical,horizontal) ou nenhum direção. A direção é utilizada em algumas paineis
 export(float, 0,4,2) var numeroDirecoes # indica o numero de direcoes validas, pode ser 0,2 ou 4
@@ -45,7 +45,6 @@ func _process(delta):
 	correcaoPosicao = ajustaInterface.get_correcao_posicao()
 	tamanhoPainel = painelGlobal.get_tamanho_painel()
 	#atualiza os valores externos <
-	
 	#seta a posição inicial >
 	posicaoInicial = Vector2(0,0)
 	#seta a posição inicial <
@@ -57,7 +56,7 @@ func _process(delta):
 	#tratamento de erros >
 	if(formaPainel == null):
 		print("forma do painel ",get_name()," nula")
-	elif(formaPainel != "casa" and formaPainel != "parede"):
+	elif(formaPainel != "casa" and formaPainel != "parede" and formaPainel != "abismo"):
 		print("forma do painel ",get_name()," invalida")
 	#tratamento de erros <
 	
@@ -77,4 +76,9 @@ func get_coordenada_painel():
 	
 func get_passivel_comida():
 	return passivelComida
- #funções get <	
+ #funções get <
+
+ #funções set >
+func set_forma_painel(forma):
+	formaPainel = forma
+ #funções set <

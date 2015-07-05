@@ -8,7 +8,6 @@ var estamina #a estamina do gato
  #variaveis <
 
 func _ready():
-	print("estou")
 
 	#inicializa variaveis >
 	estamina = 450
@@ -16,7 +15,6 @@ func _ready():
 
  #funções get >
 func get_estamina():
-	print("sim")
 	return estamina
  #funções get <
 

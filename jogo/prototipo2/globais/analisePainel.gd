@@ -15,6 +15,9 @@ var analisando #booleano que notifica ao jogo que o painel ainda está sendo ana
 var formaPainelAnalisado #recebe a forma do painel analisado.
 var coordenadaPainelAnalisado #receve a coordenada do painel analisado, em paineis.
 var exaustaoCasaAnalisada #recebe a exaustão do painel analisado, se ele for uma casa
+var tipoCasaAnalisada #recebe o tipo do painel analisado, se ele for uma casa
+var gatilhoInternoArmadilhaAnalisada #recebe a armadilha analisada tem gatilho interno
+var ativadaArmadihaAnalisada #recebe se a armadilha analisada está ativada
 var mapa #o nó do mapa do jogo
 var filhos_mapa #numero de nós filhos no mapa
 #var posicaoInicial #é a coordenada REAL da coordenada 0,0 com a medida paineis
@@ -22,6 +25,8 @@ var filhos_mapa #numero de nós filhos no mapa
 var posicaoPainelProcurado #é a posição do que está sendo procurado, em pixels
 var painelAnalisado #é o painel que está sendo analisado no momento
 var casaAnalisada #é a casa que está sendo analisada no momento
+var armadilhaAnalisada #é a armadilha que está sendo analisada no momento
+#var armadilhaEspecificaAnalisada #é o nó especifico da armadilha analisada, indiferente de qual seja.
  #variaveis <
 
 func _ready():
@@ -43,7 +48,7 @@ func _process(delta):
 	#atualiza os valores externos <
 	
 	#atualiza valores >
-	mapa = get_node("/root/mapa")
+	mapa = get_node("/root/fase/mapa")
 	if(mapa != null):
 		filhos_mapa = mapa.get_child_count()
 	#atualiza valores <
@@ -58,11 +63,13 @@ func _process(delta):
 	
 func get_painel_pela_posicao(posicao_gato,posicao_painel): #acha um painel a (x,y) de distancia da posição do gato, em tiles
 	posicaoPainelProcurado = Vector2(posicao_gato.x + (tamanhoPainel * posicao_painel.x) , posicao_gato.y + (tamanhoPainel *  posicao_painel.y))
+#	print(posicaoPainelProcurado)
 	for i in range(filhos_mapa):
 		painelAnalisado = mapa.get_child(i)
 		if(painelAnalisado.is_in_group("painel")):
 			if(painelAnalisado.get_pos() == posicaoPainelProcurado):
 				formaPainelAnalisado = painelAnalisado.get_forma_painel()
+#				print(painelAnalisado.get_name())
 #				print(formaPainelAnalisado)
 				coordenadaPainelAnalisado = painelAnalisado.get_coordenada_painel()
 #				print("coordenadaPainelAnalisado", "    ", posicaoPainelProcurado)
@@ -71,6 +78,16 @@ func get_painel_pela_posicao(posicao_gato,posicao_painel): #acha um painel a (x,
 #					print(casaAnalisada.get_name())
 					exaustaoCasaAnalisada = casaAnalisada.get_exaustao()
 #					print(exaustaoCasaAnalisada)
+					tipoCasaAnalisada = casaAnalisada.get_tipo()
+#					print(tipoCasaAnalisada)
+					if(tipoCasaAnalisada == "armadilha"):
+						armadilhaAnalisada = casaAnalisada.get_child(0)
+						gatilhoInternoArmadilhaAnalisada = armadilhaAnalisada.get_gatilho_interno()
+						if(gatilhoInternoArmadilhaAnalisada == true):
+							armadilhaAnalisada.set_ativada(true)
+							ativadaArmadihaAnalisada = armadilhaAnalisada.get_ativada()
+#							print(ativadaArmadihaAnalisada)
+
 
  #funções get >
 func get_analisando():
@@ -81,6 +98,21 @@ func get_forma_painel_analisado():
 	
 func get_exaustao_casa_analisada():
 	return exaustaoCasaAnalisada
+	
+func get_tipo_casa_analisada():
+	return tipoCasaAnalisada
+	
+func get_gatilho_interno_armadilha_analisada():
+	return gatilhoInternoArmadilhaAnalisada
+	
+func get_ativada_armadilha_analisada():
+	return ativadaArmadihaAnalisada
+
+func get_no_painel():
+	return painelAnalisado
+
+func get_no_armadilha():
+	return armadilhaAnalisada.get_child(0)
  #funções get >	
 
  #funções set >
@@ -92,6 +124,7 @@ func set_forma_painel_analisado(forma):
 	
 func set_exaustao_casa_analisada(exaustao):
 	exaustaoCasaAnalisada = exaustao
+	
  #funções set <
 
 #funções reset >
