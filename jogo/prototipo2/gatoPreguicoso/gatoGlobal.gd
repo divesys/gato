@@ -83,6 +83,9 @@ func get_travado():
 	
 func get_ativando_armadilha():
 	return ativandoArmadilha
+	
+func get_gato(): # retorna o nó do gato
+	return gato
  #funções get <
 
  #funções set >

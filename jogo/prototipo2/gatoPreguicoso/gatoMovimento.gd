@@ -19,6 +19,7 @@ var direcao # extrai a variavel direção do script gatoGlobal
 
  #variaveis >
 var gato #captura o no do gato
+var gatoAnimacao #captura o nó de animação do gato
 var andando #verifica se o gato está andando entre os paineis
 var esperaProximoMovimento #impede que o jogador mova qualquer direcao enquanto não terminar de se mover
 var passosTotal #o numero de passos que o gato da entre os tiles ao andar normalmente, serve para fazer o looping de animação após o jogador apertar uma tecla de movimento
@@ -30,6 +31,7 @@ var passosIntervalo #o intervalo entre um passo e outro
 var esperaIntervalo #um timer para esperar um intervalo
 var esperaTotal #é o tempo total que devera demorar para o gato andar
 var alterarTamanho # uma variavel que altera somando ou subtraindo no scale
+var direcaoAnterior # a direcao anterior do gato, para verificar se ele mudou de direção
  #variaveis <
 
 func _ready():
@@ -44,6 +46,7 @@ func _ready():
 	#captura os scripts externos <
 	
 	#inicializa variaveis >
+	ativadaArmadilhaAnalisada = false
 	andando = false
 	esperaProximoMovimento = false
 	passosTotal = 30
@@ -74,205 +77,86 @@ func _process(delta):
 	
 	#atualiza o nó gato >
 	gato = get_parent()
+	gatoAnimacao = gato.get_node("AnimationPlayer")
 	#atualiza o nó gato ,
 	
 #	print("andando:",andando)
 #	print("espera:",esperaProximoMovimento)
 #	print(yieldTimer.get_time_left())
-	#move o gato pra cima >
-	if(Input.is_action_pressed("ui_up")==true and Input.is_action_pressed("travarGato") == false and esperaProximoMovimento == false):
-		analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(0,-1))
+	#move o gato >
+	ativadaArmadilhaAnalisada = analisaPainel.get_ativada_armadilha_analisada()
+	if((Input.is_action_pressed("ui_up") == true or Input.is_action_pressed("ui_down") == true or Input.is_action_pressed("ui_left") == true or Input.is_action_pressed("ui_right") == true) and Input.is_action_pressed("travarGato") == false and esperaProximoMovimento == false and ativadaArmadilhaAnalisada == false):
+		if(Input.is_action_pressed("ui_up") == true):
+			analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(0,-1))
+			gatoGlobal.set_direcao("cima")
+		elif(Input.is_action_pressed("ui_down") == true):
+			analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(0,1))
+			gatoGlobal.set_direcao("baixo")
+		elif(Input.is_action_pressed("ui_left")==true):
+			analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(-1,0))
+			gatoGlobal.set_direcao("esquerda")
+		elif(Input.is_action_pressed("ui_right")==true):
+			analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(1,0))
+			gatoGlobal.set_direcao("direita")
 		formaAnalisada = analisaPainel.get_forma_painel_analisado()
 		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
 		tipoCasaAnalisada = analisaPainel.get_tipo_casa_analisada()
-		ativadaArmadilhaAnalisada = analisaPainel.get_ativada_armadilha_analisada()
-#		print(tipoCasaAnalisada)
-#		print(ativadaArmadilhaAnalisada)	
-#		print("forma: ",formaAnalisada)
-		andando = true
 		if(formaAnalisada == "casa"):
 			esperaProximoMovimento = true
-			get_node("/root/gatoGlobal").set_direcao("cima")
-#			print(get_node("/root/gatoGlobal").get_direcao())
-			gatoGlobal.set_estado("andando")
-#			print(gatoGlobal.get_estado())
 			while(passosRestantes > 0 and esperaProximoMovimento == true):
-	#			print(passosRestantes)
-				gato.translate(Vector2(0,(float(-tamanhoPainel)/passosTotal)))
+				direcao = gatoGlobal.get_direcao()
+				if(direcaoAnterior != direcao):
+						gatoGlobal.set_estado("continuaAndando")
+				if(gatoGlobal.get_direcao() == "cima"):
+					if(gatoGlobal.get_estado() != "andando"):
+						gatoAnimacao.play("gatoAndandoCima")
+						gatoGlobal.set_estado("andando")
+						direcaoAnterior = direcao
+					gato.translate(Vector2(0,(float(-tamanhoPainel)/passosTotal)))
+				elif(gatoGlobal.get_direcao() == "baixo"):
+					if(gatoGlobal.get_estado() != "andando"):
+						gatoAnimacao.play("gatoAndandoBaixo")
+						gatoGlobal.set_estado("andando")
+						direcaoAnterior = direcao
+					gato.translate(Vector2(0,(float(tamanhoPainel)/passosTotal)))
+				elif(gatoGlobal.get_direcao() == "esquerda"):
+					if(gatoGlobal.get_estado() != "andando"):
+						gatoAnimacao.play("gatoAndandoEsquerda")
+						gatoGlobal.set_estado("andando")
+						direcaoAnterior = direcao
+					gato.translate(Vector2((float(-tamanhoPainel)/passosTotal),0))
+				elif(gatoGlobal.get_direcao() == "direita"):
+					if(gatoGlobal.get_estado() != "andando"):
+						gatoAnimacao.play("gatoAndandoDireita")
+						gatoGlobal.set_estado("andando")
+						direcaoAnterior = direcao
+					gato.translate(Vector2((float(tamanhoPainel)/passosTotal),0))
 				passosRestantes -= float(1)/numeroCasasAndar
-	#			print(timer.get_wait_time())
 				timer.start()
 				yield(timer,"timeout")
-	#			print(gato.get_pos())
 				if(passosRestantes < 0):
 					passosRestantes = 0
 				if(passosRestantes == 0):
-					if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == true):
+					if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == false):
 						noArmadilha = analisaPainel.get_no_armadilha()
 						noArmadilha.ativa_armadilha()
-						gato.get_node("AnimationPlayer").play("gatoCaindo")
-						timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-						timerAnimacao.start()
-						yield(timerAnimacao,"timeout")
-						gato.set_pos(Vector2(gato.get_pos().x, gato.get_pos().y  - tamanhoPainel))
-						gato.get_node("Sprite").set_scale(Vector2(1,1))
-						gato.get_node("AnimationPlayer").play("gatoPiscando")
-						timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-						timerAnimacao.start()
-						yield(timerAnimacao,"timeout")
-						get_node("/root/gatoGlobal").set_estamina(get_node("/root/gatoGlobal").get_estamina() - 60)
 					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
+					if(Input.is_action_pressed("ui_up") == false and Input.is_action_pressed("ui_down") == false and Input.is_action_pressed("ui_left") == false and Input.is_action_pressed("ui_right") == false and ativadaArmadilhaAnalisada == false):
+						direcao = gatoGlobal.get_direcao()
+						if(direcao == "cima"):
+							gatoAnimacao.play("gatoParadoCima")
+						if(direcao == "baixo"):
+							gatoAnimacao.play("gatoParadoBaixo")
+						if(direcao == "esquerda"):
+							gatoAnimacao.play("gatoParadoEsquerda")
+						if(direcao == "direita"):
+							gatoAnimacao.play("gatoParadoDireita")
+						gatoGlobal.set_estado("parado")
 					analisaPainel.reset_painel_analisado()
-					gatoGlobal.set_estado("parado")
 					esperaProximoMovimento = false
 			passosRestantes = passosTotal
-			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))
-
-#		print(gato.get_pos())
-	#move o gato pra cima <
-
-	#move o gato pra baixo >
-	if(Input.is_action_pressed("ui_down")==true and Input.is_action_pressed("travarGato") == false and esperaProximoMovimento == false):
-		analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(0,1))
-		formaAnalisada = analisaPainel.get_forma_painel_analisado()
-		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
-		tipoCasaAnalisada = analisaPainel.get_tipo_casa_analisada()
-		ativadaArmadilhaAnalisada = analisaPainel.get_ativada_armadilha_analisada()
-#		print("forma: ",formaAnalisada)
-		andando = true
-		if(formaAnalisada == "casa"):
-			esperaProximoMovimento = true
-			get_node("/root/gatoGlobal").set_direcao("baixo")
-#			print(get_node("/root/gatoGlobal").get_direcao())
-			gatoGlobal.set_estado("andando")
-			while(passosRestantes > 0 and esperaProximoMovimento == true):
-				gato.translate(Vector2(0,float(tamanhoPainel)/passosTotal))
-				passosRestantes -= float(1)/numeroCasasAndar
-				timer.start()
-				yield(timer,'timeout')
-	#			print(passosRestantes)
-				if(passosRestantes < 0):
-					passosRestantes = 0
-				if(passosRestantes == 0):
-#					print(tipoCasaAnalisada)
-					if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == true):
-						noArmadilha = analisaPainel.get_no_armadilha()
-						noArmadilha.ativa_armadilha()
-						gato.get_node("AnimationPlayer").play("gatoCaindo")
-						timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-						timerAnimacao.start()
-						yield(timerAnimacao,"timeout")
-						gato.set_pos(Vector2(gato.get_pos().x, gato.get_pos().y  + tamanhoPainel))
-						gato.get_node("Sprite").set_scale(Vector2(1,1))
-						gato.get_node("AnimationPlayer").play("gatoPiscando")
-						timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-						timerAnimacao.start()
-						yield(timerAnimacao,"timeout")
-						get_node("/root/gatoGlobal").set_estamina(get_node("/root/gatoGlobal").get_estamina() - 60)
-					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
-					analisaPainel.reset_painel_analisado()
-					gatoGlobal.set_estado("parado")
-					esperaProximoMovimento = false
-	#			print(gato.get_pos())
-			passosRestantes = passosTotal
-	#		print(gato.get_pos())
-			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))
-	#move o gato pra baixo <
-
-	#move o gato pra direita >
-	if(Input.is_action_pressed("ui_right")==true and Input.is_action_pressed("travarGato") == false and esperaProximoMovimento == false):
-		analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(1,0))
-		formaAnalisada = analisaPainel.get_forma_painel_analisado()
-		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
-		tipoCasaAnalisada = analisaPainel.get_tipo_casa_analisada()
-		ativadaArmadilhaAnalisada = analisaPainel.get_ativada_armadilha_analisada()
-#		print("forma: ",formaAnalisada)
-		andando = true
-		if(formaAnalisada == "casa"):
-			esperaProximoMovimento = true
-			get_node("/root/gatoGlobal").set_direcao("direita")
-#			print(get_node("/root/gatoGlobal").get_direcao())
-			gatoGlobal.set_estado("andando")
-			while(passosRestantes > 0 and esperaProximoMovimento == true):
-#				print(passosRestantes)
-				gato.translate(Vector2(float(tamanhoPainel)/passosTotal,0))
-				passosRestantes -= float(1)/numeroCasasAndar
-				timer.start()
-				yield(timer,'timeout')
-	#			print(gato.get_pos())
-				if(passosRestantes < 0):
-					passosRestantes = 0
-				if(passosRestantes == 0):
-					if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == true):
-						noArmadilha = analisaPainel.get_no_armadilha()
-						noArmadilha.ativa_armadilha()
-						gato.get_node("AnimationPlayer").play("gatoCaindo")
-						timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-						timerAnimacao.start()
-						yield(timerAnimacao,"timeout")
-						gato.set_pos(Vector2(gato.get_pos().x, gato.get_pos().y  - tamanhoPainel))
-						gato.get_node("Sprite").set_scale(Vector2(1,1))
-						gato.get_node("AnimationPlayer").play("gatoPiscando")
-						timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-						timerAnimacao.start()
-						yield(timerAnimacao,"timeout")
-						get_node("/root/gatoGlobal").set_estamina(get_node("/root/gatoGlobal").get_estamina() - 30)
-					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
-					analisaPainel.reset_painel_analisado()
-					gatoGlobal.set_estado("parado")
-					esperaProximoMovimento = false
-			passosRestantes = passosTotal
-			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))
-	#		print(gato.get_pos())
-	#move o gato pra direita <
-	
-	#move o gato pra esquerda >
-	if(Input.is_action_pressed("ui_left")==true and Input.is_action_pressed("travarGato") == false and esperaProximoMovimento == false):
-		analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(-1,0))
-		formaAnalisada = analisaPainel.get_forma_painel_analisado()
-		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
-		tipoCasaAnalisada = analisaPainel.get_tipo_casa_analisada()
-		ativadaArmadilhaAnalisada = analisaPainel.get_ativada_armadilha_analisada()
-#		print("forma: ",formaAnalisada)
-		andando = true
-		if(formaAnalisada == "casa"):
-			esperaProximoMovimento = true
-			get_node("/root/gatoGlobal").set_direcao("esquerda")
-#			print(get_node("/root/gatoGlobal").get_direcao())
-			gatoGlobal.set_estado("andando")
-			while(passosRestantes > 0 and esperaProximoMovimento == true):
-	#			print(passosRestantes)
-				gato.translate(Vector2(float(-tamanhoPainel)/passosTotal,0))
-				passosRestantes -= float(1)/numeroCasasAndar
-				timer.start()
-				yield(timer,'timeout')
-	#			print(gato.get_pos())
-				if(passosRestantes < 0):
-					passosRestantes = 0
-				if(passosRestantes == 0):
-					if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == true):
-						noArmadilha = analisaPainel.get_no_armadilha()
-						noArmadilha.ativa_armadilha()
-						gato.get_node("AnimationPlayer").play("gatoCaindo")
-						timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-						timerAnimacao.start()
-						yield(timerAnimacao,"timeout")
-						gato.set_pos(Vector2(gato.get_pos().x, gato.get_pos().y  - tamanhoPainel))
-						gato.get_node("Sprite").set_scale(Vector2(1,1))
-						gato.get_node("AnimationPlayer").play("gatoPiscando")
-						timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-						timerAnimacao.start()
-						yield(timerAnimacao,"timeout")
-						get_node("/root/gatoGlobal").set_estamina(get_node("/root/gatoGlobal").get_estamina() - 30)
-					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
-					analisaPainel.reset_painel_analisado()
-					gatoGlobal.set_estado("parado")
-					esperaProximoMovimento = false
-			passosRestantes = passosTotal
-			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))
-	#		print(gato.get_pos())
-	#move o gato pra esquerda <
-	
+			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))	
+	#move o gato <	
 	
 	#script de pulo, devido a pressa, vai ficar aqui, depois de terminar o prototipo devera ser organizado num script proprio >
 	
@@ -332,12 +216,16 @@ func _process(delta):
 					elif(passosRestantes <= passosTotal/2 and passosRestantes > 0):
 						gato.get_node("Sprite").set_scale(Vector2(gato.get_node("Sprite").get_scale().x - alterarTamanho,gato.get_node("Sprite").get_scale().y - alterarTamanho))
 					if(direcao == "cima"):
+						gatoAnimacao.play("gatoPulandoCima")
 						gato.translate(Vector2(0,float(-tamanhoPainel)/passosTotal))
 					if(direcao == "baixo"):
+						gatoAnimacao.play("gatoPulandoBaixo")
 						gato.translate(Vector2(0,float(tamanhoPainel)/passosTotal))
 					if(direcao == "esquerda"):
+						gatoAnimacao.play("gatoPulandoEsquerda")
 						gato.translate(Vector2(float(-tamanhoPainel)/passosTotal,0))
 					if(direcao == "direita"):
+						gatoAnimacao.play("gatoPulandoDireita")
 						gato.translate(Vector2(float(tamanhoPainel)/passosTotal,0))
 					passosRestantes -= float(1)/numeroCasasAndar
 					timer.start()
@@ -348,29 +236,21 @@ func _process(delta):
 					if(passosRestantes == 0):
 						gatoGlobal.set_estamina(gatoGlobal.get_estamina() - (exaustaoPainel * 1.5))
 						analisaPainel.reset_painel_analisado()
-						if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == true):
+						if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == false):
 							noArmadilha = analisaPainel.get_no_armadilha()
 							noArmadilha.ativa_armadilha()
-							gato.get_node("AnimationPlayer").play("gatoCaindo")
-							timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-							timerAnimacao.start()
-							yield(timerAnimacao,"timeout")
-							if(direcao == "cima"):
-								gato.set_pos(Vector2(gato.get_pos().x, gato.get_pos().y  - tamanhoPainel))
-							if(direcao == "baixo"):
-								gato.set_pos(Vector2(gato.get_pos().x, gato.get_pos().y  + tamanhoPainel))
-							if(direcao == "esquerda"):
-								gato.set_pos(Vector2(gato.get_pos().x   - tamanhoPainel, gato.get_pos().y))
-							if(direcao == "direita"):
-								gato.set_pos(Vector2(gato.get_pos().x  + tamanhoPainel, gato.get_pos().y))
-							gato.get_node("Sprite").set_scale(Vector2(1,1))
-							gato.get_node("AnimationPlayer").play("gatoPiscando")
-							timerAnimacao.set_wait_time(gato.get_node("AnimationPlayer").get_current_animation_length())
-							timerAnimacao.start()
-							yield(timerAnimacao,"timeout")
-							get_node("/root/gatoGlobal").set_estamina(get_node("/root/gatoGlobal").get_estamina() - 60)
+						direcao = gatoGlobal.get_direcao()
+						if(direcao == "cima"):
+							gatoAnimacao.play("gatoParadoCima")
+						elif(direcao == "baixo"):
+							gatoAnimacao.play("gatoParadoBaixo")
+						elif(direcao == "esquerda"):
+							gatoAnimacao.play("gatoParadoEsquerda")
+						elif(direcao == "direita"):
+							gatoAnimacao.play("gatoParadoDireita")
 						gatoGlobal.set_estado("parado")
 						esperaProximoMovimento = false
+						
 						numeroCasasAndar = 1
 			passosRestantes = passosTotal
 			gato.set_pos(Vector2(round(gato.get_pos().x),round(gato.get_pos().y)))

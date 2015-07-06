@@ -39,6 +39,7 @@ func _ready():
 	#inicializa valores padrões >
 #	print(filhos_mapa)
 	analisando = false
+	ativadaArmadihaAnalisada = false
 	#inicializa valores padrões <
 
 func _process(delta):
@@ -84,7 +85,6 @@ func get_painel_pela_posicao(posicao_gato,posicao_painel): #acha um painel a (x,
 						armadilhaAnalisada = casaAnalisada.get_child(0)
 						gatilhoInternoArmadilhaAnalisada = armadilhaAnalisada.get_gatilho_interno()
 						if(gatilhoInternoArmadilhaAnalisada == true):
-							armadilhaAnalisada.set_ativada(true)
 							ativadaArmadihaAnalisada = armadilhaAnalisada.get_ativada()
 #							print(ativadaArmadihaAnalisada)
 

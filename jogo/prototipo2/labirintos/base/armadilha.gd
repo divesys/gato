@@ -9,6 +9,7 @@ var ativada #verdadeiro se a armadilha foi ativada
  # variaveis <
 
 func _ready():
+
 	ativada = false
 
  # funções get >
