@@ -18,6 +18,7 @@ var exaustaoCasaAnalisada #recebe a exaustão do painel analisado, se ele for um
 var tipoCasaAnalisada #recebe o tipo do painel analisado, se ele for uma casa
 var gatilhoInternoArmadilhaAnalisada #recebe a armadilha analisada tem gatilho interno
 var ativadaArmadihaAnalisada #recebe se a armadilha analisada está ativada
+var aereaArmadilhaAnalisada #recebe se a armadilha é aerea
 var mapa #o nó do mapa do jogo
 var filhos_mapa #numero de nós filhos no mapa
 #var posicaoInicial #é a coordenada REAL da coordenada 0,0 com a medida paineis
@@ -84,6 +85,7 @@ func get_painel_pela_posicao(posicao_gato,posicao_painel): #acha um painel a (x,
 					if(tipoCasaAnalisada == "armadilha"):
 						armadilhaAnalisada = casaAnalisada.get_child(0)
 						gatilhoInternoArmadilhaAnalisada = armadilhaAnalisada.get_gatilho_interno()
+						aereaArmadilhaAnalisada = armadilhaAnalisada.get_aerea()
 						if(gatilhoInternoArmadilhaAnalisada == true):
 							ativadaArmadihaAnalisada = armadilhaAnalisada.get_ativada()
 #							print(ativadaArmadihaAnalisada)
@@ -113,6 +115,9 @@ func get_no_painel():
 
 func get_no_armadilha():
 	return armadilhaAnalisada.get_child(0)
+	
+func get_aerea_armadilha_analisada():
+	return aereaArmadilhaAnalisada
  #funções get >	
 
  #funções set >

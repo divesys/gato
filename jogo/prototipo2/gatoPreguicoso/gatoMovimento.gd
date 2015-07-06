@@ -11,6 +11,7 @@ var exaustaoPainel #extrai a variavel exaustao
 var formaAnalisada #extrai a variavel formaPainelAnalisado do script analisaPainel
 var tipoCasaAnalisada #extrai a variavel tipoCasaAnalisada do script analisaPainel
 var ativadaArmadilhaAnalisada #extrai a variavel do script analisaPainel
+var aereaArmadilhaAnalisada
 var noArmadilha # é o nó da armadilha analisada
 var analisando #extrai a variavel analisando do script analisaPainel
 var exaustao #extrai a variavel exaustão do script gatoGlobal
@@ -101,6 +102,7 @@ func _process(delta):
 		formaAnalisada = analisaPainel.get_forma_painel_analisado()
 		exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
 		tipoCasaAnalisada = analisaPainel.get_tipo_casa_analisada()
+		aereaArmadilhaAnalisada = analisaPainel.get_aerea_armadilha_analisada()
 		if(formaAnalisada == "casa"):
 			esperaProximoMovimento = true
 			while(passosRestantes > 0 and esperaProximoMovimento == true):
@@ -137,7 +139,7 @@ func _process(delta):
 				if(passosRestantes < 0):
 					passosRestantes = 0
 				if(passosRestantes == 0):
-					if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == false):
+					if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == false and (aereaArmadilhaAnalisada == false or aereaArmadilhaAnalisada == null)):
 						noArmadilha = analisaPainel.get_no_armadilha()
 						noArmadilha.ativa_armadilha()
 					gatoGlobal.set_estamina(gatoGlobal.get_estamina() - exaustaoPainel)
@@ -176,6 +178,7 @@ func _process(delta):
 			analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(1,0))
 #			print(analisaPainel.get_forma_painel_analisado())
 		formaAnalisada = analisaPainel.get_forma_painel_analisado()
+		aereaArmadilhaAnalisada = analisaPainel.get_aerea_armadilha_analisada()
 #		print(formaAnalisada)
 		if(formaAnalisada != "parede" and formaAnalisada != null):
 			direcao = gatoGlobal.get_direcao()
@@ -213,6 +216,12 @@ func _process(delta):
 				while(passosRestantes > 0 and esperaProximoMovimento == true):
 					if(passosRestantes <= passosTotal and passosRestantes > passosTotal/2):
 						gato.get_node("Sprite").set_scale(Vector2(gato.get_node("Sprite").get_scale().x + alterarTamanho,gato.get_node("Sprite").get_scale().y + alterarTamanho))
+					elif(passosRestantes == passosTotal/2 and aereaArmadilhaAnalisada == true and ativadaArmadilhaAnalisada == false):
+						noArmadilha = analisaPainel.get_no_armadilha()
+						noArmadilha.ativa_armadilha()
+						timerAnimacao.set_wait_time(1.2)
+						timerAnimacao.start()
+						yield(timerAnimacao,"timeout")
 					elif(passosRestantes <= passosTotal/2 and passosRestantes > 0):
 						gato.get_node("Sprite").set_scale(Vector2(gato.get_node("Sprite").get_scale().x - alterarTamanho,gato.get_node("Sprite").get_scale().y - alterarTamanho))
 					if(direcao == "cima"):
@@ -236,7 +245,8 @@ func _process(delta):
 					if(passosRestantes == 0):
 						gatoGlobal.set_estamina(gatoGlobal.get_estamina() - (exaustaoPainel * 1.5))
 						analisaPainel.reset_painel_analisado()
-						if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == false):
+						print(aereaArmadilhaAnalisada)
+						if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == false  and aereaArmadilhaAnalisada == false):
 							noArmadilha = analisaPainel.get_no_armadilha()
 							noArmadilha.ativa_armadilha()
 						direcao = gatoGlobal.get_direcao()
