@@ -7,7 +7,7 @@ var direcao # extrai a direçao do gati
 var painelGlobal # invoca o script painelGlobal
 var tamanhoPainel # extrai o tamanho do painel
 var armadilha # é o nó da armadilha
-var ativada # verifica se a armadilha foi ativada
+#var ativada # verifica se a armadilha foi ativada
 var timer
 
 var perdaExaustao = 60
@@ -54,4 +54,10 @@ func ativa_armadilha():
 	timer.start()
 	yield(timer,"timeout")
 	get_node("/root/gatoGlobal").set_estamina(get_node("/root/gatoGlobal").get_estamina() - perdaExaustao)
+	timer.set_wait_time(0.5)
+	timer.start()
+	yield(timer,"timeout")
 	armadilha.set_ativada(false)
+	
+func get_ativada():
+	return armadilha.get_ativada()

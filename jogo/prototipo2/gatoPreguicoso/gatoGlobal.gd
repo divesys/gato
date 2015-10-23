@@ -1,6 +1,7 @@
  #guarda valores importantes do gato que precisam de acesso global, como sua estamina
 
 extends Node2D
+
  #extração de variaveis externas >
 var ajustaInterface #invoca o script ajustaInterface
 var correcaoPosicao #extrai a variavel correcaoPosicao do script ajustaInterface
@@ -54,7 +55,7 @@ func _process(delta):
 			timerAdicionado = true
 			add_child(timer)
 			timer.start()
-			print(timer.get_time_left())
+#			print(timer.get_time_left())
 			yield(timer,'timeout')
 			timerAdicionado = false
 			get_tree().change_scene_to(telaDerrota)

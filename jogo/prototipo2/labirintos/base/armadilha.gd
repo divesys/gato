@@ -5,6 +5,7 @@ extends Node2D
  # variaveis >
 export(bool) var gatilhoInterno # verdadeiro se o gatilho for interno
 export(int, 1000) var indiceArmadilha # um indice numerico para perimitir que gatilhos externos ativem a armadilha
+export(int, 1000) var grupoArmadilha # um indice numerico para perimitir que gatilhos externos ativem a armadilha
 export(bool) var aerea # indica se a armadilha é ativadda pelo pulo
 var ativada #verdadeiro se a armadilha foi ativada
  # variaveis <
@@ -12,6 +13,7 @@ var ativada #verdadeiro se a armadilha foi ativada
 func _ready():
 
 	ativada = false
+	pass
 
  # funções get >
 func get_gatilho_interno():

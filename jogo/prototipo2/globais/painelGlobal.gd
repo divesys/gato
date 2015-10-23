@@ -1,7 +1,7 @@
  #esse script trata das propriedas globais dos paineis
  #mais especificamente o tamanho do painel
 
-extends Node
+extends Node2D
 
  #extração de variaveis externas >
 var tratamentoResolucoes # invoca o script tratamentoResolucoes, responsavel pela resolucao e propoção da tela

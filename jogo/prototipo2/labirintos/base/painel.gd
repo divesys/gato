@@ -12,6 +12,8 @@ var analisaPainel #invoca o script analisa painel
  #extração de variaveis externas <
 
  #variaveis >
+export(bool) var extremoSuperior # verdadeiro se for o painel extremo superior (o painel superior esquerdo)
+export(bool) var extremoInferior # verdadeiro se for o painel extremo inferior (o painel inferior direito)
 export(bool) var passivelComida #verifica se a casa é passivel de ter comida.
 export(String, "parede","casa","abismo") var formaPainel #determina a forma do painel, que pode ser parede ou casa
 export(String, "prototipal","castelo") var familia #determina a família do painel, basicamente é o tema e no momento tem uma função mais visual, porém podera ser bem útil num futuro editor de fases
@@ -76,6 +78,12 @@ func get_coordenada_painel():
 	
 func get_passivel_comida():
 	return passivelComida
+	
+func get_extremo_superior():
+	return extremoSuperior
+	
+func get_extremo_inferior():
+	return extremoInferior
  #funções get <
 
  #funções set >

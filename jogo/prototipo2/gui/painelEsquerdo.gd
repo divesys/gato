@@ -18,12 +18,15 @@ func _ready():
 
 func _process(delta):
 	estamina = gatoGlobal.get_estamina()
-	if(estamina < 0):
-		estamina = 0
 	estaminaTotal = gatoGlobal.get_estamina_total()
-	get_node("estamina/estaminaValor").set_text(var2str(estamina))
-	get_node("estamina/ProgressBar").set_max(estaminaTotal)
-	get_node("estamina/ProgressBar").set_value(estamina)
+	if(estamina <= 0):
+		estamina = 0
+		get_node("medidorEstamina/estaminaValor").set_text(var2str(0) + "%")
+	else:
+		get_node("medidorEstamina/estaminaValor").set_text(var2str(round(estamina*100/estaminaTotal)) + "%")
+#	get_node("medidorEstamina/estaminaValor").set_text(var2str(estamina*100/estaminaTotal) + "%")
+#	get_node("estamina/ProgressBar").set_max(estaminaTotal)
+#	get_node("estamina/ProgressBar").set_value(estamina)
 	
 func get_estamina_hud():
 	return estamina

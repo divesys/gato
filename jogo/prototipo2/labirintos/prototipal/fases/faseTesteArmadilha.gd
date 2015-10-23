@@ -29,6 +29,8 @@ func _ready():
 		gatoGlobal.set_gato(gato)
 		gatoGlobal.set_estamina_total(80)
 		gatoGlobal.reset_estamina()
+		gato.get_node("Sprite").set_texture(preload("res://prototipo2/gatoPreguicoso/textures/parado/baixo/gatoParadoBaixo1.png"))
+		gato.get_node("AnimationPlayer").play("gatoParadoBaixo")
 		controlaFases.set_mundo_atual("prototipal")
 		controlaFases.set_numero_fase_atual(2)
 		controlaFases.set_fase_atual(preload("res://prototipo2/labirintos/prototipal/fases/faseTesteArmadilha.scn"))

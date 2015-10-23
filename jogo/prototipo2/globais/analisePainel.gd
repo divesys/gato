@@ -86,9 +86,8 @@ func get_painel_pela_posicao(posicao_gato,posicao_painel): #acha um painel a (x,
 						armadilhaAnalisada = casaAnalisada.get_child(0)
 						gatilhoInternoArmadilhaAnalisada = armadilhaAnalisada.get_gatilho_interno()
 						aereaArmadilhaAnalisada = armadilhaAnalisada.get_aerea()
-						if(gatilhoInternoArmadilhaAnalisada == true):
-							ativadaArmadihaAnalisada = armadilhaAnalisada.get_ativada()
-#							print(ativadaArmadihaAnalisada)
+						ativadaArmadihaAnalisada = armadilhaAnalisada.get_ativada()
+#						print(ativadaArmadihaAnalisada)
 
 
  #funções get >

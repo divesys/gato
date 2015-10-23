@@ -3,19 +3,22 @@ extends Node2D
 
 
  #extração de variaveis externas >
-var painelGlobal #invoca o script painelGlobal, responsavel pelo tamanho do painel
-var analisaPainel #invoca o script global analisaPainel
-var gatoGlobal #invoca o script global gatoGlobal
+var painelGlobal # invoca o script painelGlobal, responsavel pelo tamanho do painel
+var analisaPainel # invoca o script global analisaPainel
+var gatoGlobal # invoca o script global gatoGlobal
+var detectaComida # invoca o script detectaComida 
 var tamanhoPainel #extrai a variavel tamanhoPainel do script painelGlobal
 var exaustaoPainel #extrai a variavel exaustao
 var formaAnalisada #extrai a variavel formaPainelAnalisado do script analisaPainel
 var tipoCasaAnalisada #extrai a variavel tipoCasaAnalisada do script analisaPainel
-var ativadaArmadilhaAnalisada #extrai a variavel do script analisaPainel
 var aereaArmadilhaAnalisada
 var noArmadilha # é o nó da armadilha analisada
+var ativadaArmadilhaAnalisada #verifica se a armadilha analisada está ativada
 var analisando #extrai a variavel analisando do script analisaPainel
 var exaustao #extrai a variavel exaustão do script gatoGlobal
 var direcao # extrai a variavel direção do script gatoGlobal
+var distanciaComidaAnterior # extrai a variavel distanciaComidaAnterior do script detectaComida
+var distanciaComidaAtual # extrai a variavel distanciaComidaAtual do script detectaComida
  #extração de variaveis externas <
 
  #variaveis >
@@ -41,16 +44,16 @@ func _ready():
 	
 	#captura os scripts externos >
 	painelGlobal = get_node("/root/painelGlobal") #captura o script painelGlobal
-	analisaPainel = get_node("root/analisaPainel") #captura o script analisaPainel
-	analisaPainel = get_node("/root/analisaPainel") #captura o script analisaPainel	
-	gatoGlobal = get_node("/root/gatoGlobal")
+	analisaPainel = get_node("/root/analisaPainel") #captura o script analisaPainel
+	gatoGlobal = get_node("/root/gatoGlobal") #captura o script gatoGlobal
+	detectaComida = get_parent().get_node("detectaComida") #captura o script detectaComida
 	#captura os scripts externos <
 	
 	#inicializa variaveis >
-	ativadaArmadilhaAnalisada = false
+#	ativadaArmadilhaAnalisada = false
 	andando = false
 	esperaProximoMovimento = false
-	passosTotal = 30
+	passosTotal = 38
 	passosRestantes = passosTotal
 	esperaTotal = 0.1
 	esperaIntervalo = float(esperaTotal)/float(passosTotal)
@@ -71,8 +74,10 @@ func _ready():
 	
 func _process(delta):
 	#atualiza os valores externos >
+	print("estamina",gatoGlobal.get_estamina())
 	tamanhoPainel = painelGlobal.get_tamanho_painel()
 	analisando = analisaPainel.get_analisando()
+	distanciaComidaAtual = detectaComida.get_distancia_comida_atual()
 #	print(analisando)
 	#atualiza os valores externos <
 	
@@ -84,8 +89,11 @@ func _process(delta):
 #	print("andando:",andando)
 #	print("espera:",esperaProximoMovimento)
 #	print(yieldTimer.get_time_left())
+	if(noArmadilha == null):
+		ativadaArmadilhaAnalisada = false
+	else:
+		ativadaArmadilhaAnalisada = noArmadilha.get_ativada()
 	#move o gato >
-	ativadaArmadilhaAnalisada = analisaPainel.get_ativada_armadilha_analisada()
 	if((Input.is_action_pressed("ui_up") == true or Input.is_action_pressed("ui_down") == true or Input.is_action_pressed("ui_left") == true or Input.is_action_pressed("ui_right") == true) and Input.is_action_pressed("travarGato") == false and esperaProximoMovimento == false and ativadaArmadilhaAnalisada == false):
 		if(Input.is_action_pressed("ui_up") == true):
 			analisaPainel.get_painel_pela_posicao(get_pos(),Vector2(0,-1))
@@ -105,6 +113,7 @@ func _process(delta):
 		aereaArmadilhaAnalisada = analisaPainel.get_aerea_armadilha_analisada()
 		if(formaAnalisada == "casa"):
 			esperaProximoMovimento = true
+			detectaComida.set_distancia_comida_anterior(distanciaComidaAtual)
 			while(passosRestantes > 0 and esperaProximoMovimento == true):
 				direcao = gatoGlobal.get_direcao()
 				if(direcaoAnterior != direcao):
@@ -162,7 +171,7 @@ func _process(delta):
 	
 	#script de pulo, devido a pressa, vai ficar aqui, depois de terminar o prototipo devera ser organizado num script proprio >
 	
-	if(Input.is_action_pressed("pular") == true and Input.is_action_pressed("travarGato") == false and andando == false and esperaProximoMovimento == false):
+	if(Input.is_action_pressed("pular") == true and Input.is_action_pressed("travarGato") == false and andando == false and esperaProximoMovimento == false and ativadaArmadilhaAnalisada == false):
 		andando = true
 		direcao = gatoGlobal.get_direcao()
 		if(direcao == "cima"):
@@ -208,7 +217,6 @@ func _process(delta):
 				formaAnalisada = analisaPainel.get_forma_painel_analisado()
 				exaustaoPainel = analisaPainel.get_exaustao_casa_analisada()
 				tipoCasaAnalisada = analisaPainel.get_tipo_casa_analisada()
-				ativadaArmadilhaAnalisada = analisaPainel.get_ativada_armadilha_analisada()
 				gatoGlobal.set_estado("pulando")
 				gato.get_node("SamplePlayer2D").play("pulo")
 				numeroCasasAndar = 2
@@ -245,7 +253,7 @@ func _process(delta):
 					if(passosRestantes == 0):
 						gatoGlobal.set_estamina(gatoGlobal.get_estamina() - (exaustaoPainel * 1.5))
 						analisaPainel.reset_painel_analisado()
-						print(aereaArmadilhaAnalisada)
+#						print(aereaArmadilhaAnalisada)
 						if(tipoCasaAnalisada == "armadilha" and ativadaArmadilhaAnalisada == false  and aereaArmadilhaAnalisada == false):
 							noArmadilha = analisaPainel.get_no_armadilha()
 							noArmadilha.ativa_armadilha()

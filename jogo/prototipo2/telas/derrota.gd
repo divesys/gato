@@ -11,7 +11,7 @@ func _ready():
 	set_process(true)
 	get_node("MenuContinuar/MenuContinuar_Continuar").grab_focus()
 	get_node("/root/gatoGlobal")
-	print("derrotado")
+#	print("derrotado")
 	
 
 func _process(delta):
